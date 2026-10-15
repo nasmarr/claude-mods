@@ -49,7 +49,27 @@ export const parseGit = (out: string): Git | undefined => {
   return { branch, changed, ahead, behind }
 }
 
-export const shortenPath = (path: string): string =>
+const FAMILIES = ['opus', 'sonnet', 'haiku', 'fable']
+const capitalize = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1)
+
+// `claude-opus-5-5` → `Opus 5.5`. Handles date suffixes, `[1m]`, Bedrock/Vertex
+// prefixes and the older `claude-3-5-sonnet` order; anything else passes through.
+export const prettyModel = (id: string): string => {
+  const oneM = /\[1m\]$/i.test(id) ? ' 1M' : ''
+  const name = id
+    .toLowerCase()
+    .replace(/\[1m\]$/, '')
+    .replace(/^.*?claude-/, '')
+    .replace(/-v\d+(:\d+)?$/, '') // Bedrock `-v1:0`
+    .replace(/[-@]\d{8}$/, '') // date suffix, Vertex `@20250929`
+  const parts = name.split('-')
+  const family = parts.find(p => FAMILIES.includes(p))
+  const version = parts.filter(p => /^\d+$/.test(p) && p.length <= 2)
+  if (!family || !version.length) return id
+  return `${capitalize(family)} ${version.join('.')}${oneM}`
+}
+
+export const shortenPath =(path: string): string =>
   path.replace(/^\/home\/[^/]+(?=\/|$)/, '~')
 
 const RATE_LIMIT_LABELS: Record<string, string> = { five_hour: '5h', seven_day: '7d', spend_limit: 'spend' }
@@ -75,7 +95,7 @@ export const formatGroups = (l: Line): Segment[][] => {
     groups.push(g)
   }
   groups.push([{ text: shortenPath(l.cwd), color: MOCHA.blue }])
-  if (l.model) groups.push([{ text: l.model, color: MOCHA.lavender }])
+  if (l.model) groups.push([{ text: prettyModel(l.model), color: MOCHA.lavender }])
   if (l.contextPercent !== undefined) {
     const pct = Math.round(l.contextPercent)
     groups.push([{ text: `ctx ${pct}%`, color: fillColor(pct) }])

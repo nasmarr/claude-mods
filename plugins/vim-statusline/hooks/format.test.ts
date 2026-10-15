@@ -1,5 +1,25 @@
 import { describe, test, expect } from 'claude-code/testing'
-import { formatLine, formatSegments, parseGit, MOCHA } from './format.ts'
+import { formatLine, formatSegments, parseGit, prettyModel, MOCHA } from './format.ts'
+
+describe('prettyModel', () => {
+  test('turns model ids into short names', () => {
+    expect(prettyModel('claude-opus-5-5')).toBe('Opus 5.5')
+    expect(prettyModel('claude-fable-5-1')).toBe('Fable 5.1')
+    expect(prettyModel('claude-haiku-5-5')).toBe('Haiku 5.5')
+    expect(prettyModel('claude-sonnet-4-5-20250929')).toBe('Sonnet 4.5')
+    expect(prettyModel('claude-opus-4-20250514')).toBe('Opus 4')
+    expect(prettyModel('claude-3-5-sonnet-20241022')).toBe('Sonnet 3.5')
+  })
+  test('handles the 1M variant and cloud ids', () => {
+    expect(prettyModel('claude-opus-5-5[1m]')).toBe('Opus 5.5 1M')
+    expect(prettyModel('us.anthropic.claude-sonnet-4-5-20250929-v1:0')).toBe('Sonnet 4.5')
+    expect(prettyModel('claude-sonnet-4-5@20250929')).toBe('Sonnet 4.5')
+  })
+  test('leaves names it does not know alone', () => {
+    expect(prettyModel('Opus 5.5')).toBe('Opus 5.5')
+    expect(prettyModel('gpt-oss-120b')).toBe('gpt-oss-120b')
+  })
+})
 
 describe('parseGit', () => {
   test('reads branch, changes and ahead/behind', () => {
@@ -16,7 +36,7 @@ describe('formatLine', () => {
     const line = formatLine({
       git: { branch: 'main', changed: 3, ahead: 1, behind: 0 },
       cwd: '/home/user/proj',
-      model: 'Opus 5.5',
+      model: 'claude-opus-5-5',
       contextPercent: 41.6,
       costUsd: 0.314,
       rateLimits: [{ kind: 'seven_day', percentUsed: 55 }, { kind: 'five_hour', percentUsed: 20 }],

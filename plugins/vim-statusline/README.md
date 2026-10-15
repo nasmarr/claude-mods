@@ -21,6 +21,10 @@ With every segment showing:
 | `5h 20%` `7d 55%` | Usage limits, colored the same way |
 | `14:05` | Time, refreshed every 30 seconds |
 
+In a narrow window it gives up the least useful parts first: the hint text,
+then the time, then the folder's parent path (`~/work/proj` → `proj`). It
+refits as you resize.
+
 It refreshes on session start, after each turn, after Bash/Edit/Write tool
 calls (so branch switches show up), and on the clock.
 

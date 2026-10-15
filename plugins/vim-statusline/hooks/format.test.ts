@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'claude-code/testing'
-import { formatLine, formatSegments, parseGit, prettyModel, MOCHA } from './format.ts'
+import { fitLine, folderName, formatLine, formatSegments, parseGit, prettyModel, LEAD, MOCHA, SEP } from './format.ts'
 
 describe('prettyModel', () => {
   test('turns model ids into short names', () => {
@@ -65,5 +65,37 @@ describe('formatSegments', () => {
       { text: ' │ ', color: MOCHA.overlay0 },
       { text: 'ctx 90%', color: MOCHA.red },
     ])
+  })
+})
+
+describe('fitLine', () => {
+  const l = { git: { branch: 'main', changed: 0, ahead: 0, behind: 0 }, cwd: '/home/user/work/proj', model: 'claude-opus-5-5', time: '14:05' }
+  const hint = '(shift+tab to cycle)'
+  const text = (f: ReturnType<typeof fitLine>) => f.segments.map(s => s.text).join('') + (f.hint ? SEP + f.hint : '')
+  const full = formatLine(l) + SEP + hint
+
+  test('keeps everything when there is room', () => {
+    expect(text(fitLine(l, hint, LEAD + full.length))).toBe(full)
+  })
+  test('drops the hint first', () => {
+    expect(text(fitLine(l, hint, LEAD + full.length - 1))).toBe('⎇ main │ ~/work/proj │ Opus 5.5 │ 14:05')
+  })
+  test('then the time', () => {
+    const noTime = '⎇ main │ ~/work/proj │ Opus 5.5'
+    expect(text(fitLine(l, hint, LEAD + [...noTime].length))).toBe(noTime)
+  })
+  test('then the folder\'s parents', () => {
+    expect(text(fitLine(l, hint, LEAD + 20))).toBe('⎇ main │ proj │ Opus 5.5')
+  })
+  test('keeps everything when the width is unknown', () => {
+    expect(text(fitLine(l, hint, Infinity))).toBe(full)
+  })
+})
+
+describe('folderName', () => {
+  test('keeps only the last folder', () => {
+    expect(folderName('/home/user/work/proj')).toBe('proj')
+    expect(folderName('/home/user')).toBe('~')
+    expect(folderName('/')).toBe('/')
   })
 })

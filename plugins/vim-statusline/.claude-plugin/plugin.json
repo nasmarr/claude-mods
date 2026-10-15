@@ -1,6 +1,6 @@
 {
   "name": "vim-statusline",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "A Neovim-style status line in Catppuccin colors: git branch, changes, folder, model, context, cost, time",
   "types": "./types/index.d.ts",
   "author": {

@@ -1,16 +1,6 @@
-import type { Segment } from '../types'
+import type { Segment, Git, Line } from '../types'
 
-export type Git = { branch: string; changed: number; ahead: number; behind: number }
-
-export type Line = {
-  git?: Git
-  cwd: string
-  model?: string
-  contextPercent?: number
-  costUsd?: number
-  rateLimits?: { kind: string; percentUsed: number }[]
-  time?: string
-}
+export type { Git, Line }
 
 // Catppuccin Mocha.
 export const MOCHA = {
@@ -116,3 +106,24 @@ export const formatSegments = (l: Line): Segment[] =>
   formatGroups(l).flatMap((g, i) => (i ? [{ text: SEP, color: MOCHA.overlay0 }, ...g] : g))
 
 export const formatLine = (l: Line): string => formatSegments(l).map(s => s.text).join('')
+
+// Room the engine takes before the line: the indent and a mode label like `⏵⏵ auto mode on · `.
+export const LEAD = 22
+
+const cells = (s: string): number => [...s].length
+const segmentsWidth = (segs: Segment[]): number => segs.reduce((n, s) => n + cells(s.text), 0)
+
+// `~/work/claude-mods` → `claude-mods`.
+export const folderName = (path: string): string => shortenPath(path).split('/').filter(Boolean).pop() ?? '/'
+
+// Fits the line to the terminal, giving up the least useful parts first: the
+// hint, then the time, then the folder's parents. Past that the row truncates.
+export const fitLine = (l: Line, hint: string | undefined, columns: number): { segments: Segment[]; hint?: string } => {
+  const room = columns - LEAD
+  const full = formatSegments(l)
+  if (!hint || segmentsWidth(full) + cells(SEP + hint) <= room) return { segments: full, hint }
+  if (segmentsWidth(full) <= room) return { segments: full }
+  const noTime = formatSegments({ ...l, time: undefined })
+  if (segmentsWidth(noTime) <= room) return { segments: noTime }
+  return { segments: formatSegments({ ...l, time: undefined, cwd: folderName(l.cwd) }) }
+}

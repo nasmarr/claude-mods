@@ -1,0 +1,14 @@
+{
+  "name": "nasmarr-mods",
+  "owner": {
+    "name": "nasmarr"
+  },
+  "description": "A small catalog of Claude Code mods",
+  "plugins": [
+    {
+      "name": "vim-statusline",
+      "source": "./plugins/vim-statusline",
+      "description": "A Neovim-style status line in Catppuccin colors: git branch, changes, folder, model, context, cost, usage, time"
+    }
+  ]
+}

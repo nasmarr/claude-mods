@@ -3,6 +3,10 @@
 A Neovim-style status line for Claude Code, in Catppuccin Mocha colors. It
 replaces the hint line under the prompt:
 
+![vim-statusline in Claude Code](screenshot.png)
+
+With every segment showing:
+
 ```
 ⎇ main ●3 ↑1 │ ~/proj │ Opus 5.5 │ ctx 42% │ $0.31 │ 5h 20% │ 7d 55% │ 14:05
 ```

@@ -29,7 +29,7 @@ To update by hand instead: `/plugin marketplace update nasmarr-mods`.
 
 | Mod | What it does |
 | --- | --- |
-| [vim-statusline](plugins/vim-statusline) | A Neovim-style status line in Catppuccin Mocha colors: git branch and changes, folder, model, context use, cost, usage limits and the time. |
+| [vim-statusline](plugins/vim-statusline)<br><img src="plugins/vim-statusline/screenshot.png" width="320"> | A Neovim-style status line in Catppuccin Mocha colors: git branch and changes, folder, model, context use, cost, usage limits and the time. |
 
 ## Developing
 
